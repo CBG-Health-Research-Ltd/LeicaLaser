@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -30,13 +32,15 @@ namespace LeicaLaserInterface
         public MainWindow()
         {
             InitializeComponent();
+            initialiseSurveyorInfo();
             try
             {
                 OpenLeicaService();
                 
                 MinimizeLeicaService();
-                
-                
+                Keyboard.Focus(H1Measurement);
+
+
             }
             catch
             {
@@ -44,6 +48,7 @@ namespace LeicaLaserInterface
             }
             //MonitorConnection();
             this.Topmost = true;
+            this.Focus();
             Keyboard.Focus(H1Measurement);
 
             StartBleDeviceWatcher();
@@ -77,8 +82,8 @@ namespace LeicaLaserInterface
         
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-         
-        Keyboard.Focus(H1Measurement);
+            this.Focus();
+            Keyboard.Focus(H1Measurement);
             
         }
 
@@ -87,7 +92,7 @@ namespace LeicaLaserInterface
             //CSV conversion must go here with appropriate handling. Currently checking for decimal point at string position 2
             try
             {
-                if (arrayMeasurements[0, 1].Substring(0, 2).Contains(".") && arrayMeasurements[1, 1].Substring(0, 2).Contains("."))
+                if (arrayMeasurements[1, 1].Substring(0, 2).Contains(".") && arrayMeasurements[2, 1].Substring(0, 2).Contains("."))
                 {
                     string csv = ArrayToCsv(arrayMeasurements);
                     WriteCSVFile(csv);
@@ -310,29 +315,79 @@ namespace LeicaLaserInterface
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             }
         }
+        string[,] arrayMeasurements = new string[3, 6];
+        private void initialiseSurveyorInfo()
+        {
+            arrayMeasurements[0, 0] = "MeasureType";
+            arrayMeasurements[0, 1] = "Measurement";
+            arrayMeasurements[0, 2] = "Qtr";
+            arrayMeasurements[0, 3] = "MB";
+            arrayMeasurements[0, 4] = "HHID";
+            arrayMeasurements[0, 5] = "RespondentID";
+            string[] respondentInfo = GetRespondentIdentifiers();
+            arrayMeasurements[1, 2] = respondentInfo[0];
+            arrayMeasurements[1, 3] = respondentInfo[1];
+            arrayMeasurements[1, 4] = respondentInfo[2];
+            arrayMeasurements[1, 5] = respondentInfo[3];
+            arrayMeasurements[2, 2] = respondentInfo[0];
+            arrayMeasurements[2, 3] = respondentInfo[1];
+            arrayMeasurements[2, 4] = respondentInfo[2];
+            arrayMeasurements[2, 5] = respondentInfo[3];
 
 
-        string[,] arrayMeasurements = new string[2,2];
+        }
+
+        private string[] GetRespondentIdentifiers()
+        {
+            string respIDs = File.ReadLines(@"C:\NZHS\surveyinstructions\MeasurementInfo.txt").First();
+            string[] respIDSplit = respIDs.Split('+');
+            return respIDSplit;
+        }
+
+        string previousInput = "";
         private void H1Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (H1Measurement.Text.Length > 5)
+            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+            Match m = r.Match(H1Measurement.Text);
+            if (m.Success)
+            {
+                previousInput = H1Measurement.Text;
+            }
+            else
+            {
+                H1Measurement.Text = previousInput;
+            }
+
+            if (H1Measurement.Text.Length == 5)
             {
                 string rounded = H1Measurement.Text.Substring(0, 5);
-                arrayMeasurements[0, 0] = "HT";
-                arrayMeasurements[0, 1] = rounded;
-                updateH1Text(rounded.ToString());
+                arrayMeasurements[1, 0] = "HT";
+                arrayMeasurements[1, 1] = rounded;
+                //updateH1Text(rounded.ToString());
                 Keyboard.Focus(H2Measurement);
             }
         }
 
+        string previousInput1 = "";
         private void H2Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (H2Measurement.Text.Length > 5)
+            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+            Match m = r.Match(H2Measurement.Text);
+            if (m.Success)
+            {
+                previousInput1 = H2Measurement.Text;
+            }
+            else
+            {
+                H2Measurement.Text = previousInput1;
+            }
+
+            if (H2Measurement.Text.Length == 5)
             {
                 string rounded = H2Measurement.Text.Substring(0, 5);
-                arrayMeasurements[1, 0] = "HT";
-                arrayMeasurements[1, 1] = rounded;
-                updateH2Text(rounded.ToString());
+                arrayMeasurements[2, 0] = "HT";
+                arrayMeasurements[2, 1] = rounded;
+                //updateH2Text(rounded.ToString());
                 Keyboard.Focus(H1Measurement);
             }
         }
