@@ -32,11 +32,14 @@ namespace LeicaLaserInterface
         public MainWindow()
         {
             InitializeComponent();
+            //Gets surveyor info as saved by sample manager in MeasurementInfo.txt <qtr>+<MB>+<HHID>+<RespondentID> to be used in csv saving of data
             initialiseSurveyorInfo();
             try
             {
+                //Open the DISTO connect service provided by leica to connect the bluetooth device.
                 OpenLeicaService();
                 
+                //Minimise it, for some reason this doesn't seem to work. MAYBE launch from SM before launching from here, won't be any conflicts.
                 MinimizeLeicaService();
                 Keyboard.Focus(H1Measurement);
 
@@ -44,18 +47,21 @@ namespace LeicaLaserInterface
             }
             catch
             {
+                //The attempt to open Leica service has faled, so it probbaly doesn't exist.
                 MessageBox.Show("Could not find DISTO service for Bluetooth transfer");
             }
-            //MonitorConnection();
-            this.Topmost = true;
+            //MonitorConnection(); Old fashioned polling method, keep it here just in case or for future reference.
+            this.Topmost = true; //Set this window to be above the Leica service window
             this.Focus();
             Keyboard.Focus(H1Measurement);
 
+            //Begins watching for the Leica laser connection. This continues as a background thread so we can watch for disconnections as well.
             StartBleDeviceWatcher();
             this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
 
         }
 
+        //Below is the leica service that needs to be opened to connect. Device must already be paired.
         Process process = new Process();
         void OpenLeicaService()
         {
@@ -71,6 +77,7 @@ namespace LeicaLaserInterface
 
         }
 
+        //Function attempts to minimise Leica service although it hasn't been successful. 
         private void MinimizeLeicaService()
         {
             
@@ -79,7 +86,7 @@ namespace LeicaLaserInterface
             DistoTransfer.Minimize();
         }
 
-        
+        //Focus on the first measurement textbox H1measurement to get the surveyor ready for measurement once 'CONNECTED' is displayed.
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             this.Focus();
@@ -87,11 +94,12 @@ namespace LeicaLaserInterface
             
         }
 
+        //Button_click is the 'Done Measuring' button. 
         private void button_Click(object sender, RoutedEventArgs e)
         {
             //CSV conversion must go here with appropriate handling. Currently checking for decimal point at string position 2
             try
-            {
+            {    //Scanning for a decimal point from the first two indexes as expected from Leica laser input.
                 if (arrayMeasurements[1, 1].Substring(0, 2).Contains(".") && arrayMeasurements[2, 1].Substring(0, 2).Contains("."))
                 {
                     string csv = ArrayToCsv(arrayMeasurements);
@@ -102,12 +110,13 @@ namespace LeicaLaserInterface
                     Application.Current.Shutdown();
                 }
                 else
-                {
+                {   //Data has been entered but it does not match the expected 1.000 format of the leica laser.
                     MessageBox.Show("Incorrect height format. \n\n Please ensure you've collected results using Bluetooth Laser");
                 }
             }
             catch
             {
+                //Exception is thrown due to arrayMeasurements not being complete, and therefore the text fields are empty.
                 MessageBox.Show("Please enter some measurements");
             }
             
@@ -168,6 +177,8 @@ namespace LeicaLaserInterface
             // sample for an example.
             deviceWatcher.Start();
         }
+
+        //Function pulled and edited from the UWP Bluetooth app provided by microsoft. 
         private async void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation deviceInfo)
         {
             await Task.Run(async () =>
@@ -199,10 +210,11 @@ namespace LeicaLaserInterface
 
         }
 
+        //This function searches for the actual laser everytime bluetooth device enumeration (device watcher) is updated.
         private async void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate deviceInfoUpdate)
         {
 
-            //if contains salter and salter is connectable stop all other handlers and connect  
+            //Code adapted from microsoft UWP BLE app
             await Task.Run(async () =>
             {
                 lock (this)
@@ -226,12 +238,14 @@ namespace LeicaLaserInterface
                             }
                             if (bleDeviceDisplay.IsConnected == false && bleDeviceDisplay.Name.Contains("DISTO"))
                             {
+                                //This cna have a bit of a delay on the UI, maybe find out why.
                                 updateConnectionStatus("Disconnected");
                             }
 
                             return;
                         }
 
+                        //Just extra handling, not sure if completely neccessary.
                         DeviceInformation deviceInfo = FindUnknownDevices(deviceInfoUpdate.Id);
                         if (deviceInfo != null)
                         {
@@ -315,6 +329,8 @@ namespace LeicaLaserInterface
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             }
         }
+
+        //Initialising all the needed fields for the 3x6 csv for logging measurements.
         string[,] arrayMeasurements = new string[3, 6];
         private void initialiseSurveyorInfo()
         {
@@ -337,6 +353,7 @@ namespace LeicaLaserInterface
 
         }
 
+        //reads the MeasurementInfo.txt file generated by SM containing relevant respondent info
         private string[] GetRespondentIdentifiers()
         {
             string respIDs = File.ReadLines(@"C:\NZHS\surveyinstructions\MeasurementInfo.txt").First();
@@ -344,10 +361,11 @@ namespace LeicaLaserInterface
             return respIDSplit;
         }
 
+
         string previousInput = "";
         private void H1Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // Permitting only numeric values and one decimal point
             Match m = r.Match(H1Measurement.Text);
             if (m.Success)
             {
@@ -360,10 +378,11 @@ namespace LeicaLaserInterface
 
             if (H1Measurement.Text.Length == 5)
             {
+                //Added the actual mesurement to the array
                 string rounded = H1Measurement.Text.Substring(0, 5);
                 arrayMeasurements[1, 0] = "HT";
                 arrayMeasurements[1, 1] = rounded;
-                //updateH1Text(rounded.ToString());
+                updateH1Text(rounded.ToString());
                 Keyboard.Focus(H2Measurement);
             }
         }
@@ -384,6 +403,7 @@ namespace LeicaLaserInterface
 
             if (H2Measurement.Text.Length == 5)
             {
+                //Adding the second measurement to the array
                 string rounded = H2Measurement.Text.Substring(0, 5);
                 arrayMeasurements[2, 0] = "HT";
                 arrayMeasurements[2, 1] = rounded;
@@ -417,6 +437,7 @@ namespace LeicaLaserInterface
             return sb.ToString();
         }
 
+        //Height measurement specific csv file
         private void WriteCSVFile(string csvMeasurements)
         {
 
@@ -428,12 +449,9 @@ namespace LeicaLaserInterface
 
         }
 
+        //Window control for handling of external windows.
         public class WindowControl
         {
-            //Set-up to declare which application we want to perform controls on. Vary for chrome and 
-            //LaptopShowcards minimisation.
-            //"chrome"
-            //"BluetoothTestClient"
             private string appName;  // the name field
             public string AppName    // the Name property
             {
