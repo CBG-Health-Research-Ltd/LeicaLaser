@@ -122,6 +122,7 @@ namespace LeicaLaserInterface
                         H1Measurement.IsEnabled = false;
                         H2Measurement.IsEnabled = false;
                         button.IsEnabled = false;
+                        button.Visibility = Visibility.Hidden;
                         textBlock6.Visibility = Visibility.Visible;
                         textBlock5.Visibility = Visibility.Visible;
                         H3Measurement.Visibility = Visibility.Visible;
@@ -134,13 +135,15 @@ namespace LeicaLaserInterface
                 }
                 else
                 {   //Data has been entered but it does not match the expected 1.000 format of the leica laser.
-                    MessageBox.Show("Incorrect height format. \n\n Please ensure you've collected results using Bluetooth Laser");
+                    MessageBox.Show("Incorrect height format. \n\n Please ensure you've collected results using Bluetooth Laser.\n\n" +
+                        "If you are entering manually, the format expected is 3 decimal places.\nFor Example 1.43 meters should be input as 1.430");
                 }
             }
             catch
             {
                 //Exception is thrown due to arrayMeasurements not being complete, and therefore one or both the text fields are empty.
-                MessageBox.Show("Please enter some measurements.\n\nEnsure you are using Bluetooth Laser for measuring.");
+                MessageBox.Show("Please enter some measurements.\n\nEnsure you are using Bluetooth Laser for measuring.\n\n" +
+                    "If you are entering manually, the format expected is 3 decimal places.\nFor Example 1.43 meters should be input as 1.430");
             }
             
         }
@@ -162,13 +165,15 @@ namespace LeicaLaserInterface
                 }
                 else
                 {   //Data has been entered but it does not match the expected 1.000 format of the leica laser.
-                    MessageBox.Show("Incorrect height format. \n\n Please ensure you've collected results using Bluetooth Laser");
+                    MessageBox.Show("Incorrect height format. \n\n Please ensure you've collected results using Bluetooth Laser\n\n" +
+                        "If you are entering manually, the format expected is 3 decimal places.\nFor Example 1.43 meters should be input as 1.430");
                 }
             }
             catch
             {
                 //Exception is thrown due to arrayMeasurements not being complete, and therefore one or both the text fields are empty.
-                MessageBox.Show("Please enter some measurements.\n\nEnsure you are using Bluetooth Laser for measuring.");
+                MessageBox.Show("Please enter some measurements.\n\nEnsure you are using Bluetooth Laser for measuring.\n\n" +
+                    "If you are entering manually, the format expected is 3 decimal places.\nFor Example 1.43 meters should be input as 1.430");
             }
         }
 

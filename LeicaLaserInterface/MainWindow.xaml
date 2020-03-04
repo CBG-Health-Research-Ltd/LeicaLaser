@@ -21,7 +21,7 @@
         <TextBlock x:Name="textBlock5" HorizontalAlignment="Left" Margin="125,423,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Visibility="Hidden"><Run Text="H3"/><Run Text=":"/></TextBlock>
         <TextBox x:Name="H3Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="256,423,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="H3Measurement_TextChanged" IsEnabled="False" Visibility="Hidden"/>
         <TextBlock x:Name="textBlock4_Copy1" HorizontalAlignment="Left" Margin="371,427,0,0" TextWrapping="Wrap" Text="meters" VerticalAlignment="Top" FontSize="16" Visibility="Hidden"/>
-        <Button x:Name="button1" Content="Submit Final Measurements" HorizontalAlignment="Left" Margin="108,567,0,0" VerticalAlignment="Top" Width="294" Height="50" FontSize="18" Visibility="Hidden" Click="button1_Click"/>
+        <Button x:Name="button1" Content="Done Measuring" HorizontalAlignment="Left" Margin="186,488,0,0" VerticalAlignment="Top" Width="168" Height="44" FontSize="20" Visibility="Hidden" Click="button1_Click"/>
         <TextBlock x:Name="textBlock6" HorizontalAlignment="Left" Height="42" Margin="53,353,0,0" TextWrapping="Wrap" Text="The first two measurements are not within 1% of eachother. Please submit a third measurement." VerticalAlignment="Top" Width="431" FontSize="16" Visibility="Hidden"/>
     </Grid>
 
