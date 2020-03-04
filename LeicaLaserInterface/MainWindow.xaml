@@ -5,19 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LeicaLaserInterface"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="515">
+        Title="MainWindow" Height="737.6" Width="515">
     <Grid Margin="0,10,-82,0" Height="725" VerticalAlignment="Top">
         <TextBlock x:Name="AppTitle" HorizontalAlignment="Left" Margin="32,29,0,635" Text="Laser Height Measurement" TextWrapping="Wrap" Width="429" FontSize="32" TextAlignment="Center"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="96,95,0,0" Text="Please turn on the Leica Laser to connect Bluetooth" TextWrapping="Wrap" VerticalAlignment="Top" Width="323" FontSize="14" Height="30"/>
-        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="53,157,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="24" Height="42" Width="206"><Run Text="Connection Status"/><Run Text=":"/><LineBreak/><Run/></TextBlock>
-        <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="125,280,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="60"><Run Text="H1"/><Run Text=":"/></TextBlock>
-        <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="125,403,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20"><Run Text="H2"/><Run Text=":"/></TextBlock>
-        <Button x:Name="button" Content="Done Measuring" Margin="170,517,252.8,0" VerticalAlignment="Top" FontSize="20" Click="button_Click" Height="39"/>
-        <TextBox x:Name="H1Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="257,278,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="H1Measurement_TextChanged"/>
-        <TextBox x:Name="H2Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="257,403,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="H2Measurement_TextChanged"/>
-        <TextBlock x:Name="Connectionstatus" HorizontalAlignment="Left" Margin="317,161,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Disconnected" FontSize="20"/>
-        <TextBlock x:Name="textBlock4" HorizontalAlignment="Left" Margin="371,280,0,0" TextWrapping="Wrap" Text="meters" VerticalAlignment="Top" FontSize="16"/>
-        <TextBlock x:Name="textBlock4_Copy" HorizontalAlignment="Left" Margin="371,407,0,0" TextWrapping="Wrap" Text="meters" VerticalAlignment="Top" FontSize="16"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="73,95,0,0" Text="Please turn on the Leica Laser to connect Bluetooth" TextWrapping="Wrap" VerticalAlignment="Top" Width="365" FontSize="16" Height="30"/>
+        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Margin="53,145,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="24" Height="42" Width="206"><Run Text="Connection Status"/><Run Text=":"/><LineBreak/><Run/></TextBlock>
+        <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Margin="125,219,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="60"><Run Text="H1"/><Run Text=":"/></TextBlock>
+        <TextBlock x:Name="textBlock3" HorizontalAlignment="Left" Margin="125,292,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20"><Run Text="H2"/><Run Text=":"/></TextBlock>
+        <Button x:Name="button" Content="Done Measuring" Margin="186,488,236.8,0" VerticalAlignment="Top" FontSize="20" Click="button_Click" Height="39"/>
+        <TextBox x:Name="H1Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="256,219,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="H1Measurement_TextChanged"/>
+        <TextBox x:Name="H2Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="256,291,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="H2Measurement_TextChanged"/>
+        <TextBlock x:Name="Connectionstatus" HorizontalAlignment="Left" Margin="318,149,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Disconnected" FontSize="20"/>
+        <TextBlock x:Name="textBlock4" HorizontalAlignment="Left" Margin="371,219,0,0" TextWrapping="Wrap" Text="meters" VerticalAlignment="Top" FontSize="16"/>
+        <TextBlock x:Name="textBlock4_Copy" HorizontalAlignment="Left" Margin="371,291,0,0" TextWrapping="Wrap" Text="meters" VerticalAlignment="Top" FontSize="16"/>
+        <TextBlock x:Name="textBlock5" HorizontalAlignment="Left" Margin="125,423,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Visibility="Hidden"><Run Text="H3"/><Run Text=":"/></TextBlock>
+        <TextBox x:Name="H3Measurement" MaxLength="5" HorizontalAlignment="Left" Margin="256,423,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="20" Width="98" TextChanged="H3Measurement_TextChanged" IsEnabled="False" Visibility="Hidden"/>
+        <TextBlock x:Name="textBlock4_Copy1" HorizontalAlignment="Left" Margin="371,427,0,0" TextWrapping="Wrap" Text="meters" VerticalAlignment="Top" FontSize="16" Visibility="Hidden"/>
+        <Button x:Name="button1" Content="Submit Final Measurements" HorizontalAlignment="Left" Margin="108,567,0,0" VerticalAlignment="Top" Width="294" Height="50" FontSize="18" Visibility="Hidden" Click="button1_Click"/>
+        <TextBlock x:Name="textBlock6" HorizontalAlignment="Left" Height="42" Margin="53,353,0,0" TextWrapping="Wrap" Text="The first two measurements are not within 1% of eachother. Please submit a third measurement." VerticalAlignment="Top" Width="431" FontSize="16" Visibility="Hidden"/>
     </Grid>
 
 </Window>

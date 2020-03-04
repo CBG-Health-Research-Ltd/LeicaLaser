@@ -97,17 +97,39 @@ namespace LeicaLaserInterface
         //Button_click is the 'Done Measuring' button. 
         private void button_Click(object sender, RoutedEventArgs e)
         {
+            decimal measurement1;
+            decimal measurement2;
             //CSV conversion must go here with appropriate handling. Currently checking for decimal point at string position 2
             try
             {    //Scanning for a decimal point from the first two indexes as expected from Leica laser input.
                 if (arrayMeasurements[1, 1].Substring(0, 2).Contains(".") && arrayMeasurements[2, 1].Substring(0, 2).Contains("."))
                 {
-                    string csv = ArrayToCsv(arrayMeasurements);
-                    WriteCSVFile(csv);
-                    WindowControl DistoTransfer = new WindowControl();
-                    DistoTransfer.AppName = "DistoTransfer";
-                    DistoTransfer.Close();
-                    Application.Current.Shutdown();
+                    measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
+                    measurement2 = ConvertStrToDec(arrayMeasurements[2, 1]);
+                    if (CheckGreaterOnePercentDiff(measurement1, measurement2) == false)//Checking that there is a less than 1% difference between two measurements
+                    {
+                        string csv = ArrayToCsv(arrayMeasurements);
+                        WriteCSVFile(csv);
+                        WindowControl DistoTransfer = new WindowControl();
+                        DistoTransfer.AppName = "DistoTransfer";
+                        DistoTransfer.Close();
+                        Application.Current.Shutdown();
+                    }
+                    else //There is a greater than 1% difference, therefore get a 3rd measurement by enabling third measurement box.
+                    {
+                        //Disable first two measurement boxes. Enable third measurement box, shift focus to third measurement, disable Done measuring Box, 
+                        //enable submit final measurements.
+                        H1Measurement.IsEnabled = false;
+                        H2Measurement.IsEnabled = false;
+                        button.IsEnabled = false;
+                        textBlock6.Visibility = Visibility.Visible;
+                        textBlock5.Visibility = Visibility.Visible;
+                        H3Measurement.Visibility = Visibility.Visible;
+                        button1.Visibility = Visibility.Visible;
+                        H3Measurement.IsEnabled = true;
+                        H3Measurement.Focus();
+                    }
+
                 }
                 else
                 {   //Data has been entered but it does not match the expected 1.000 format of the leica laser.
@@ -116,15 +138,40 @@ namespace LeicaLaserInterface
             }
             catch
             {
-                //Exception is thrown due to arrayMeasurements not being complete, and therefore the text fields are empty.
-                MessageBox.Show("Please enter some measurements");
+                //Exception is thrown due to arrayMeasurements not being complete, and therefore one or both the text fields are empty.
+                MessageBox.Show("Please enter some measurements.\n\nEnsure you are using Bluetooth Laser for measuring.");
             }
             
         }
 
-        
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {    //Run appropriate data check on the 3rd measurement
+                if (arrayMeasurements[3, 1].Substring(0, 2).Contains("."))
+                {
+                    //Do appropriate CSV conversion for ALL measurements and save
+                    string csv = ArrayToCsv(arrayMeasurements);
+                    WriteCSVFile(csv);
+                    WindowControl DistoTransfer = new WindowControl();
+                    DistoTransfer.AppName = "DistoTransfer";
+                    DistoTransfer.Close();
+                    Application.Current.Shutdown();
 
-        public void updateConnectionStatus(string text)
+                }
+                else
+                {   //Data has been entered but it does not match the expected 1.000 format of the leica laser.
+                    MessageBox.Show("Incorrect height format. \n\n Please ensure you've collected results using Bluetooth Laser");
+                }
+            }
+            catch
+            {
+                //Exception is thrown due to arrayMeasurements not being complete, and therefore one or both the text fields are empty.
+                MessageBox.Show("Please enter some measurements.\n\nEnsure you are using Bluetooth Laser for measuring.");
+            }
+        }
+
+            public void updateConnectionStatus(string text)
         {
             Application.Current.Dispatcher.Invoke(() => { Connectionstatus.Text = text; });
         }
@@ -330,8 +377,8 @@ namespace LeicaLaserInterface
             }
         }
 
-        //Initialising all the needed fields for the 3x6 csv for logging measurements.
-        string[,] arrayMeasurements = new string[3, 6];
+        //Initialising all the needed fields for the 4x6 csv for logging measurements.
+        string[,] arrayMeasurements = new string[4, 6];
         private void initialiseSurveyorInfo()
         {
             arrayMeasurements[0, 0] = "MeasureType";
@@ -349,6 +396,10 @@ namespace LeicaLaserInterface
             arrayMeasurements[2, 3] = respondentInfo[1];
             arrayMeasurements[2, 4] = respondentInfo[2];
             arrayMeasurements[2, 5] = respondentInfo[3];
+            arrayMeasurements[3, 2] = respondentInfo[0];
+            arrayMeasurements[3, 3] = respondentInfo[1];
+            arrayMeasurements[3, 4] = respondentInfo[2];
+            arrayMeasurements[3, 5] = respondentInfo[3];
 
 
         }
@@ -409,6 +460,69 @@ namespace LeicaLaserInterface
                 arrayMeasurements[2, 1] = rounded;
                 //updateH2Text(rounded.ToString());
                 Keyboard.Focus(H1Measurement);
+            }
+        }
+
+        string previousInput2 = "";
+        private void H3Measurement_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+            Match m = r.Match(H3Measurement.Text);
+            if (m.Success)
+            {
+                previousInput2 = H3Measurement.Text;
+            }
+            else
+            {
+                H3Measurement.Text = previousInput2;
+            }
+
+            if (H3Measurement.Text.Length == 5)
+            {
+                //Adding the second measurement to the array
+                string rounded = H3Measurement.Text.Substring(0, 5);
+                arrayMeasurements[3, 0] = "HT";
+                arrayMeasurements[3, 1] = rounded;
+                //updateH2Text(rounded.ToString());
+                //Keyboard.Focus(H1Measurement);
+            }
+        }
+
+        private decimal ConvertStrToDec(string value)
+        {
+            decimal convert = Convert.ToDecimal(value);
+            return convert;
+        }
+
+        private bool CheckGreaterOnePercentDiff(decimal value1, decimal value2)
+        {
+            if ( value1 > value2 )
+            {
+                decimal percent = ((value1 / value2)*100);
+                if(percent > 101)
+                {
+                    return true; //true indicating that there is a higher than 1% difference
+                }
+                else
+                {
+                    return false; //false indicating that the difference is within 1%
+                }
+            }
+            else if (value2 > value1)
+            {
+                decimal percent = ((value2 / value1) * 100);
+                if (percent > 101)
+                {
+                    return true; //true indicating that there is a higher than 1% difference
+                }
+                else
+                {
+                    return false; //false indicating that the difference is within 1%
+                }
+            }
+            else
+            {
+                return false; // All other cases false as value1 and value2 will be equal
             }
         }
 
