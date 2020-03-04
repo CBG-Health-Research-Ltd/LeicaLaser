@@ -126,6 +126,7 @@ namespace LeicaLaserInterface
                         textBlock5.Visibility = Visibility.Visible;
                         H3Measurement.Visibility = Visibility.Visible;
                         button1.Visibility = Visibility.Visible;
+                        textBlock4_Copy1.Visibility = Visibility.Visible;
                         H3Measurement.IsEnabled = true;
                         H3Measurement.Focus();
                     }
@@ -144,7 +145,7 @@ namespace LeicaLaserInterface
             
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void button1_Click(object sender, RoutedEventArgs e)//This is the button for thrid measurement submission
         {
             try
             {    //Run appropriate data check on the 3rd measurement
@@ -441,7 +442,7 @@ namespace LeicaLaserInterface
         string previousInput1 = "";
         private void H2Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // Permitting only numeric values and one decimal point
             Match m = r.Match(H2Measurement.Text);
             if (m.Success)
             {
@@ -466,7 +467,7 @@ namespace LeicaLaserInterface
         string previousInput2 = "";
         private void H3Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // This is the main part, can be altered to match any desired form or limitations
+            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // Permitting only numeric values and one decimal point
             Match m = r.Match(H3Measurement.Text);
             if (m.Success)
             {
