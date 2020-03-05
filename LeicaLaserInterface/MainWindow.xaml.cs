@@ -177,9 +177,16 @@ namespace LeicaLaserInterface
             }
         }
 
-            public void updateConnectionStatus(string text)
+        public void updateConnectionStatus(string text)
         {
-            Application.Current.Dispatcher.Invoke(() => { Connectionstatus.Text = text; });
+            if (text == "CONNECTED")
+            {
+                Application.Current.Dispatcher.Invoke(() => { Connectionstatus.Text = text; Connectionstatus.Foreground = Brushes.Green; });
+            }
+            if (text == "Disconnected")
+            {
+                Application.Current.Dispatcher.Invoke(() => { Connectionstatus.Text = text; Connectionstatus.Foreground = Brushes.Black; });
+            }
         }
 
         public void updateH1Text(string text)
