@@ -177,6 +177,59 @@ namespace LeicaLaserInterface
             }
         }
 
+        bool manualMeasurement = false;
+        bool regexOverride = false;//allows usage of text box clear operations to delte old results by not having regex applied to user input
+        private void checkBox_Checked(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            manualMeasurement = true;
+            Application.Current.Dispatcher.Invoke(() => { H1Measurement.Clear(); H2Measurement.Clear(); H3Measurement.Clear(); });
+            MessageBox.Show("You are now entering measurements manually.\n\n" +
+                "Please ensure measurements are of 3 decimal place format\n\n" +
+                "For example, 1.43 meters should be inout as 1.430.\n" +
+                "1 meter should be input as 1.000");
+            //////
+            RunCleanUp();
+            H1Measurement.Focus();
+            ///////
+            regexOverride = false;
+           
+        }
+
+        private void checkBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            manualMeasurement = false;
+            Application.Current.Dispatcher.Invoke(() => { H1Measurement.Clear(); H2Measurement.Clear(); H3Measurement.Clear(); });
+            MessageBox.Show("You are now entering measurements with Bluetooth.");
+            //////
+            RunCleanUp();
+            H1Measurement.Focus();
+            ////////
+            regexOverride = false;
+        }
+
+        public void RunCleanUp()
+        {
+            arrayMeasurements[1, 1] = null;
+            arrayMeasurements[2, 1] = null;
+            arrayMeasurements[3, 1] = null;
+            H1Measurement.IsEnabled = true;
+            H2Measurement.IsEnabled = true;
+            button.IsEnabled = true;
+            button.Visibility = Visibility.Visible;
+            textBlock6.Visibility = Visibility.Hidden;
+            textBlock5.Visibility = Visibility.Hidden;
+            H3Measurement.Visibility = Visibility.Hidden;
+            button1.Visibility = Visibility.Hidden;
+            textBlock4_Copy1.Visibility = Visibility.Hidden;
+            H3Measurement.IsEnabled = false;
+            H1Measurement.Focus();
+            previousInput = "";
+            previousInput1 = "";
+            previousInput2 = "";
+        }
+
         public void updateConnectionStatus(string text)
         {
             if (text == "CONNECTED")
@@ -391,7 +444,7 @@ namespace LeicaLaserInterface
         }
 
         //Initialising all the needed fields for the 4x6 csv for logging measurements.
-        string[,] arrayMeasurements = new string[4, 6];
+        string[,] arrayMeasurements = new string[4, 7];
         private void initialiseSurveyorInfo()
         {
             arrayMeasurements[0, 0] = "MeasureType";
@@ -400,6 +453,7 @@ namespace LeicaLaserInterface
             arrayMeasurements[0, 3] = "MB";
             arrayMeasurements[0, 4] = "HHID";
             arrayMeasurements[0, 5] = "RespondentID";
+            arrayMeasurements[0, 6] = "MeasurementInputType";
             string[] respondentInfo = GetRespondentIdentifiers();
             arrayMeasurements[1, 2] = respondentInfo[0];
             arrayMeasurements[1, 3] = respondentInfo[1];
@@ -429,41 +483,58 @@ namespace LeicaLaserInterface
         string previousInput = "";
         private void H1Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // Permitting only numeric values and one decimal point
-            Match m = r.Match(H1Measurement.Text);
-            if (m.Success)
+            if (regexOverride == false)
             {
-                previousInput = H1Measurement.Text;
-            }
-            else
-            {
-                H1Measurement.Text = previousInput;
+                Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // Permitting only numeric values and one decimal point
+                Match m = r.Match(H1Measurement.Text);
+                if (m.Success)
+                {
+                    previousInput = H1Measurement.Text;
+                }
+                else
+                {
+                    H1Measurement.Text = previousInput;
+                }
             }
 
             if (H1Measurement.Text.Length == 5)
             {
-                //Added the actual mesurement to the array
-                string rounded = H1Measurement.Text.Substring(0, 5);
-                arrayMeasurements[1, 0] = "HT";
-                arrayMeasurements[1, 1] = rounded;
-                updateH1Text(rounded.ToString());
-                Keyboard.Focus(H2Measurement);
+
+                    //Added the actual mesurement to the array
+                    string rounded = H1Measurement.Text.Substring(0, 5);
+                    arrayMeasurements[1, 0] = "HT";
+                    arrayMeasurements[1, 1] = rounded;
+                    //updateH1Text(rounded.ToString());
+                    if (manualMeasurement == false)
+                        {
+                        arrayMeasurements[1, 6] = "BluetoothInput";
+                        }
+                    else
+                        {
+                        arrayMeasurements[1, 6] = "ManualInput";
+                        }
+                    Keyboard.Focus(H2Measurement);               
             }
         }
 
         string previousInput1 = "";
         private void H2Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // Permitting only numeric values and one decimal point
-            Match m = r.Match(H2Measurement.Text);
-            if (m.Success)
+            if (regexOverride == false)
             {
-                previousInput1 = H2Measurement.Text;
+                Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // Permitting only numeric values and one decimal point
+                Match m = r.Match(H2Measurement.Text);
+                if (m.Success)
+                {
+                    previousInput1 = H2Measurement.Text;
+                }
+                else
+                {
+                    H2Measurement.Text = previousInput1;
+                }
             }
-            else
-            {
-                H2Measurement.Text = previousInput1;
-            }
+
+
 
             if (H2Measurement.Text.Length == 5)
             {
@@ -472,22 +543,33 @@ namespace LeicaLaserInterface
                 arrayMeasurements[2, 0] = "HT";
                 arrayMeasurements[2, 1] = rounded;
                 //updateH2Text(rounded.ToString());
-                Keyboard.Focus(H1Measurement);
+                if (manualMeasurement == false)
+                {
+                    arrayMeasurements[2, 6] = "BluetoothInput";
+                }
+                else
+                {
+                    arrayMeasurements[2, 6] = "ManualInput";
+                }
+                //Keyboard.Focus(H1Measurement);
             }
         }
 
         string previousInput2 = "";
         private void H3Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // Permitting only numeric values and one decimal point
-            Match m = r.Match(H3Measurement.Text);
-            if (m.Success)
+            if (regexOverride == false)
             {
-                previousInput2 = H3Measurement.Text;
-            }
-            else
-            {
-                H3Measurement.Text = previousInput2;
+                Regex r = new Regex("^-{0,1}\\d+\\.{0,1}\\d*$"); // Permitting only numeric values and one decimal point
+                Match m = r.Match(H3Measurement.Text);
+                if (m.Success)
+                {
+                    previousInput2 = H3Measurement.Text;
+                }
+                else
+                {
+                    H3Measurement.Text = previousInput2;
+                }
             }
 
             if (H3Measurement.Text.Length == 5)
@@ -497,6 +579,14 @@ namespace LeicaLaserInterface
                 arrayMeasurements[3, 0] = "HT";
                 arrayMeasurements[3, 1] = rounded;
                 //updateH2Text(rounded.ToString());
+                if (manualMeasurement == false)
+                {
+                    arrayMeasurements[3, 6] = "BluetoothInput";
+                }
+                else
+                {
+                    arrayMeasurements[3, 6] = "ManualInput";
+                }
                 //Keyboard.Focus(H1Measurement);
             }
         }
@@ -628,5 +718,6 @@ namespace LeicaLaserInterface
             }
 
         }
+
     }
 }
