@@ -128,6 +128,7 @@ namespace LeicaLaserInterface
                         H3Measurement.Visibility = Visibility.Visible;
                         button1.Visibility = Visibility.Visible;
                         textBlock4_Copy1.Visibility = Visibility.Visible;
+                        clear3.Visibility = Visibility.Visible;
                         H3Measurement.IsEnabled = true;
                         H3Measurement.Focus();
                     }
@@ -223,6 +224,7 @@ namespace LeicaLaserInterface
             H3Measurement.Visibility = Visibility.Hidden;
             button1.Visibility = Visibility.Hidden;
             textBlock4_Copy1.Visibility = Visibility.Hidden;
+            clear3.Visibility = Visibility.Hidden;
             H3Measurement.IsEnabled = false;
             H1Measurement.Focus();
             previousInput = "";
