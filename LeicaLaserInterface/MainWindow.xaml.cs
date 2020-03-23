@@ -215,6 +215,9 @@ namespace LeicaLaserInterface
             arrayMeasurements[1, 1] = null;
             arrayMeasurements[2, 1] = null;
             arrayMeasurements[3, 1] = null;
+            arrayMeasurements[1, 6] = null;
+            arrayMeasurements[2, 6] = null;
+            arrayMeasurements[3, 6] = null;
             H1Measurement.IsEnabled = true;
             H2Measurement.IsEnabled = true;
             button.IsEnabled = true;
@@ -515,6 +518,10 @@ namespace LeicaLaserInterface
                         {
                         arrayMeasurements[1, 6] = "ManualInput";
                         }
+                MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                    "2nd measurement will be enabled after 10 seconds.");
+                Thread.Sleep(10000);
+                    
                     Keyboard.Focus(H2Measurement);               
             }
         }
@@ -720,6 +727,8 @@ namespace LeicaLaserInterface
             }
 
         }
+
+        
 
     }
 }
