@@ -48,7 +48,8 @@ namespace LeicaLaserInterface
             catch
             {
                 //The attempt to open Leica service has faled, so it probbaly doesn't exist.
-                MessageBox.Show("Could not find DISTO service for Bluetooth transfer");
+                MessageBox.Show("Could not find DISTO service for Bluetooth transfer.\n\n" +
+                    "Please contact IT support letting them know DISTO Laser service is missing.");
             }
             //MonitorConnection(); Old fashioned polling method, keep it here just in case or for future reference.
             this.Topmost = true; //Set this window to be above the Leica service window
@@ -102,7 +103,7 @@ namespace LeicaLaserInterface
             //CSV conversion must go here with appropriate handling. Currently checking for decimal point at string position 2
             try
             {    //Scanning for a decimal point from the first two indexes as expected from Leica laser input.
-                if (arrayMeasurements[1, 1].Substring(0, 2).Contains(".") && arrayMeasurements[2, 1].Substring(0, 2).Contains("."))
+                if (arrayMeasurements[1, 1].Substring(0, 2).Contains(".") && arrayMeasurements[2, 1].Substring(0, 2).Contains(".") && arrayMeasurements[1, 1].Length == 5 && arrayMeasurements[2, 1].Length == 5)
                 {
                     measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
                     measurement2 = ConvertStrToDec(arrayMeasurements[2, 1]);
@@ -119,6 +120,9 @@ namespace LeicaLaserInterface
                     {
                         //Disable first two measurement boxes. Enable third measurement box, shift focus to third measurement, disable Done measuring Box, 
                         //enable submit final measurements.
+                        MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                        "3rd measurement will be enabled after 10 seconds of closing this message.");
+                        Thread.Sleep(10000);
                         H1Measurement.IsEnabled = false;
                         H2Measurement.IsEnabled = false;
                         button.IsEnabled = false;
@@ -153,7 +157,7 @@ namespace LeicaLaserInterface
         {
             try
             {    //Run appropriate data check on the 3rd measurement
-                if (arrayMeasurements[3, 1].Substring(0, 2).Contains("."))
+                if (arrayMeasurements[3, 1].Substring(0, 2).Contains(".") && (arrayMeasurements[3,1].Length == 5))
                 {
                     //Do appropriate CSV conversion for ALL measurements and save
                     string csv = ArrayToCsv(arrayMeasurements);
@@ -195,6 +199,31 @@ namespace LeicaLaserInterface
             ///////
             regexOverride = false;
            
+        }
+
+        //Clearing measurements from individual fields
+        private void clear1_Click(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            Application.Current.Dispatcher.Invoke(() => { H1Measurement.Clear(); });
+            H1Measurement.Focus();
+            regexOverride = false;
+        }
+
+        private void clear2_Click(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            Application.Current.Dispatcher.Invoke(() => { H2Measurement.Clear(); });
+            H2Measurement.Focus();
+            regexOverride = false;
+        }
+
+        private void clear3_Click(object sender, RoutedEventArgs e)
+        {
+            regexOverride = true;
+            Application.Current.Dispatcher.Invoke(() => { H3Measurement.Clear(); });
+            H3Measurement.Focus();
+            regexOverride = false;
         }
 
         private void checkBox_Unchecked(object sender, RoutedEventArgs e)
@@ -727,8 +756,6 @@ namespace LeicaLaserInterface
             }
 
         }
-
-        
 
     }
 }
