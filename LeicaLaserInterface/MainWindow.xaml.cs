@@ -50,6 +50,7 @@ namespace LeicaLaserInterface
                 //The attempt to open Leica service has faled, so it probbaly doesn't exist.
                 MessageBox.Show("Could not find DISTO service for Bluetooth transfer.\n\n" +
                     "Please contact IT support letting them know DISTO Laser service is missing.");
+                Application.Current.Shutdown();
             }
             //MonitorConnection(); Old fashioned polling method, keep it here just in case or for future reference.
             this.Topmost = true; //Set this window to be above the Leica service window
@@ -102,7 +103,7 @@ namespace LeicaLaserInterface
             decimal measurement2;
             //CSV conversion must go here with appropriate handling. Currently checking for decimal point at string position 2
             try
-            {    //Scanning for a decimal point from the first two indexes as expected from Leica laser input.
+            {    //Scanning for a decimal point from the first two indexes as expected from Leica laser input. Length must always equal 5 for correct input.
                 if (arrayMeasurements[1, 1].Substring(0, 2).Contains(".") && arrayMeasurements[2, 1].Substring(0, 2).Contains(".") && arrayMeasurements[1, 1].Length == 5 && arrayMeasurements[2, 1].Length == 5)
                 {
                     measurement1 = ConvertStrToDec(arrayMeasurements[1, 1]);
@@ -156,7 +157,7 @@ namespace LeicaLaserInterface
         private void button1_Click(object sender, RoutedEventArgs e)//This is the button for thrid measurement submission
         {
             try
-            {    //Run appropriate data check on the 3rd measurement
+            {    //Run appropriate data check on the 3rd measurement. For proper measurement DP will always be in the same place.
                 if (arrayMeasurements[3, 1].Substring(0, 2).Contains(".") && (arrayMeasurements[3,1].Length == 5))
                 {
                     //Do appropriate CSV conversion for ALL measurements and save
@@ -182,6 +183,7 @@ namespace LeicaLaserInterface
             }
         }
 
+        //Checkbox below determines whether manual measurement or not
         bool manualMeasurement = false;
         bool regexOverride = false;//allows usage of text box clear operations to delte old results by not having regex applied to user input
         private void checkBox_Checked(object sender, RoutedEventArgs e)
@@ -226,6 +228,7 @@ namespace LeicaLaserInterface
             regexOverride = false;
         }
 
+        //checkbox unchecked is returning to bluetooth measruements
         private void checkBox_Unchecked(object sender, RoutedEventArgs e)
         {
             regexOverride = true;
@@ -239,6 +242,7 @@ namespace LeicaLaserInterface
             regexOverride = false;
         }
 
+        //Clean up to original state expecting first measurement
         public void RunCleanUp()
         {
             arrayMeasurements[1, 1] = null;
@@ -264,6 +268,7 @@ namespace LeicaLaserInterface
             previousInput2 = "";
         }
 
+        //update UI to let usrveyor know connected
         public void updateConnectionStatus(string text)
         {
             if (text == "CONNECTED")
@@ -286,6 +291,8 @@ namespace LeicaLaserInterface
             Application.Current.Dispatcher.Invoke(() => { H2Measurement.Text = text; });
         }
 
+        //Below monitors all BT events on machine and handles appropriately. The updated event is the one to be concerned with regarding connecton status.
+        //This code is modified from UWP Microsoft BT app.
         private ObservableCollection<BluetoothLEDeviceDisplay> KnownDevices = new ObservableCollection<BluetoothLEDeviceDisplay>();
         private List<DeviceInformation> UnknownDevices = new List<DeviceInformation>();
 
@@ -358,10 +365,11 @@ namespace LeicaLaserInterface
         }
 
         //This function searches for the actual laser everytime bluetooth device enumeration (device watcher) is updated.
+        //Code adapted from microsoft UWP BLE app
         private async void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate deviceInfoUpdate)
         {
 
-            //Code adapted from microsoft UWP BLE app
+            
             await Task.Run(async () =>
             {
                 lock (this)
@@ -410,6 +418,7 @@ namespace LeicaLaserInterface
 
         }
 
+        //Retrieves ID of specific BT devices
         private BluetoothLEDeviceDisplay FindBluetoothLEDeviceDisplay(string id)
         {
             foreach (BluetoothLEDeviceDisplay bleDeviceDisplay in KnownDevices)
@@ -422,6 +431,7 @@ namespace LeicaLaserInterface
             return null;
         }
 
+        //Devices that are unkown, i.e. haven't been added to BT history
         private DeviceInformation FindUnknownDevices(string id)
         {
             foreach (DeviceInformation bleDeviceInfo in UnknownDevices)
@@ -531,7 +541,7 @@ namespace LeicaLaserInterface
                 }
             }
 
-            if (H1Measurement.Text.Length == 5)
+            if (H1Measurement.Text.Length == 5) //The correct laser values are of a length of 5, so whether auto or manual we can handle here
             {
 
                     //Added the actual mesurement to the array
@@ -549,7 +559,7 @@ namespace LeicaLaserInterface
                         }
                 MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
                     "2nd measurement will be enabled after 10 seconds.");
-                Thread.Sleep(10000);
+                Thread.Sleep(10000); //Enforces delay for surveyor to re-position. This may not be the best way to handle. Maybe disabling everything with a new timer better
                     
                     Keyboard.Focus(H2Measurement);               
             }
@@ -574,7 +584,7 @@ namespace LeicaLaserInterface
 
 
 
-            if (H2Measurement.Text.Length == 5)
+            if (H2Measurement.Text.Length == 5)//The correct laser values are of a length of 5, so whether auto or manual we can handle here
             {
                 //Adding the second measurement to the array
                 string rounded = H2Measurement.Text.Substring(0, 5);
@@ -610,7 +620,7 @@ namespace LeicaLaserInterface
                 }
             }
 
-            if (H3Measurement.Text.Length == 5)
+            if (H3Measurement.Text.Length == 5)//The correct laser values are of a length of 5, so whether auto or manual we can handle here
             {
                 //Adding the second measurement to the array
                 string rounded = H3Measurement.Text.Substring(0, 5);
@@ -635,6 +645,7 @@ namespace LeicaLaserInterface
             return convert;
         }
 
+        //used in checking the final values are within 1% difference of eachother
         private bool CheckGreaterOnePercentDiff(decimal value1, decimal value2)
         {
             if ( value1 > value2 )
@@ -667,6 +678,7 @@ namespace LeicaLaserInterface
             }
         }
 
+        //Changes any rectangular array, 2d array, to an appropriate csv string.
         static string ArrayToCsv(string[,] values)
         {
             // Get the bounds.
@@ -704,7 +716,7 @@ namespace LeicaLaserInterface
 
         }
 
-        //Window control for handling of external windows.
+        //Window control for handling of external windows. 
         public class WindowControl
         {
             private string appName;  // the name field
