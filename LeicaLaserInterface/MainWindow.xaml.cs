@@ -127,7 +127,7 @@ namespace LeicaLaserInterface
                         button.Visibility = Visibility.Visible;
                         isThirdMeasurement = true;
                         MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
-                        "3rd measurement will be enabled after 10 seconds of closing this message.");
+                        "3rd measurement will be enabled 10 seconds after closing this message.");
                         waiting3rdMeasurement.Visibility = Visibility.Visible;
                         repositionTimer = new System.Windows.Threading.DispatcherTimer();
                         repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
@@ -558,7 +558,7 @@ namespace LeicaLaserInterface
                         H1Measurement.IsEnabled = false;
                         waiting.Visibility = Visibility.Visible;
                         MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
-                        "2nd measurement will be enabled after 10 seconds.");
+                        "2nd measurement will be enabled 10 seconds after closing this message.");
                         repositionTimer = new System.Windows.Threading.DispatcherTimer();
                         repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
                         repositionTimer.Interval = new TimeSpan(0, 0, 10);
@@ -572,7 +572,7 @@ namespace LeicaLaserInterface
             }
         }
 
-        //This event fires once the 10 second re-positioning timer is up. Enabling H2 measurement input.
+        //This event fires once the 10 second re-positioning timer is up. Enabling H2 measurement input and H3.
         DispatcherTimer repositionTimer;
         private void repositionTimer_Tick(object sender, EventArgs e)
         {
