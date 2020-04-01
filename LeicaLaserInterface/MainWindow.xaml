@@ -26,7 +26,9 @@
         <CheckBox x:Name="checkBox" Content="Manual Measurement" HorizontalAlignment="Left" Margin="77,178,0,0" VerticalAlignment="Top" FontSize="14" Height="22" Width="168" Checked="checkBox_Checked" Unchecked="checkBox_Unchecked"/>
         <Button x:Name="clear1" Content="X" HorizontalAlignment="Left" Margin="415,219,0,0" VerticalAlignment="Top" Width="23" FontSize="20" FontFamily="Lucida Console" Background="White" Foreground="#FFDD1B1B" BorderBrush="#FF0B0B0B" Click="clear1_Click"/>
         <Button x:Name="clear2" Content="X" HorizontalAlignment="Left" Margin="415,289,0,0" VerticalAlignment="Top" Width="23" FontSize="20" FontFamily="Lucida Console" Background="White" Foreground="#FFDD1B1B" BorderBrush="#FF0B0B0B" Click="clear2_Click"/>
-        <Button x:Name="clear3" Content="X" HorizontalAlignment="Left" Margin="415,423,0,0" VerticalAlignment="Top" Width="23" FontSize="20" FontFamily="Lucida Console" Background="White" Foreground="#FFDD1B1B" Visibility="Visible" BorderBrush="#FF0B0B0B" RenderTransformOrigin="0.435,-0.707" Click="clear3_Click"/>
+        <Button x:Name="clear3" Content="X" HorizontalAlignment="Left" Margin="415,423,0,0" VerticalAlignment="Top" Width="23" FontSize="20" FontFamily="Lucida Console" Background="White" Foreground="#FFDD1B1B" Visibility="Hidden" BorderBrush="#FF0B0B0B" RenderTransformOrigin="0.435,-0.707" Click="clear3_Click"/>
+        <TextBlock x:Name="waiting" HorizontalAlignment="Left" Margin="256,270,0,0" TextWrapping="Wrap" Text="Waiting...." Visibility="Hidden" VerticalAlignment="Top" Width="53"/>
+        <TextBlock x:Name="waiting3rdMeasurement" HorizontalAlignment="Left" Margin="140,353,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Hidden" Width="273"><Run Text="Waiting for third measurement re-positioning"/><Run Text="...."/></TextBlock>
     </Grid>
 
 </Window>

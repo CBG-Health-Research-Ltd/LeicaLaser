@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 
@@ -96,7 +97,8 @@ namespace LeicaLaserInterface
             
         }
 
-        //Button_click is the 'Done Measuring' button. 
+        //Button_click is the 'Done Measuring' button.
+        bool isThirdMeasurement = false;
         private void button_Click(object sender, RoutedEventArgs e)
         {
             decimal measurement1;
@@ -121,21 +123,17 @@ namespace LeicaLaserInterface
                     {
                         //Disable first two measurement boxes. Enable third measurement box, shift focus to third measurement, disable Done measuring Box, 
                         //enable submit final measurements.
+                        button.IsEnabled = false;
+                        button.Visibility = Visibility.Visible;
+                        isThirdMeasurement = true;
                         MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
                         "3rd measurement will be enabled after 10 seconds of closing this message.");
-                        Thread.Sleep(10000);
-                        H1Measurement.IsEnabled = false;
-                        H2Measurement.IsEnabled = false;
-                        button.IsEnabled = false;
-                        button.Visibility = Visibility.Hidden;
-                        textBlock6.Visibility = Visibility.Visible;
-                        textBlock5.Visibility = Visibility.Visible;
-                        H3Measurement.Visibility = Visibility.Visible;
-                        button1.Visibility = Visibility.Visible;
-                        textBlock4_Copy1.Visibility = Visibility.Visible;
-                        clear3.Visibility = Visibility.Visible;
-                        H3Measurement.IsEnabled = true;
-                        H3Measurement.Focus();
+                        waiting3rdMeasurement.Visibility = Visibility.Visible;
+                        repositionTimer = new System.Windows.Threading.DispatcherTimer();
+                        repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
+                        repositionTimer.Interval = new TimeSpan(0, 0, 10);
+                        repositionTimer.Start();
+                        
                     }
 
                 }
@@ -260,6 +258,8 @@ namespace LeicaLaserInterface
             H3Measurement.Visibility = Visibility.Hidden;
             button1.Visibility = Visibility.Hidden;
             textBlock4_Copy1.Visibility = Visibility.Hidden;
+            clear1.IsEnabled = true;
+            clear2.IsEnabled = true;
             clear3.Visibility = Visibility.Hidden;
             H3Measurement.IsEnabled = false;
             H1Measurement.Focus();
@@ -524,6 +524,8 @@ namespace LeicaLaserInterface
         }
 
 
+
+
         string previousInput = "";
         private void H1Measurement_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -552,17 +554,60 @@ namespace LeicaLaserInterface
                     if (manualMeasurement == false)
                         {
                         arrayMeasurements[1, 6] = "BluetoothInput";
+                        H2Measurement.IsEnabled = false;
+                        H1Measurement.IsEnabled = false;
+                        waiting.Visibility = Visibility.Visible;
+                        MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                        "2nd measurement will be enabled after 10 seconds.");
+                        repositionTimer = new System.Windows.Threading.DispatcherTimer();
+                        repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
+                        repositionTimer.Interval = new TimeSpan(0, 0, 10);
+                        repositionTimer.Start();
                         }
-                    else
+                        else
                         {
                         arrayMeasurements[1, 6] = "ManualInput";
                         }
-                MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
-                    "2nd measurement will be enabled after 10 seconds.");
-                Thread.Sleep(10000); //Enforces delay for surveyor to re-position. This may not be the best way to handle. Maybe disabling everything with a new timer better
-                    
-                    Keyboard.Focus(H2Measurement);               
+                        
             }
+        }
+
+        //This event fires once the 10 second re-positioning timer is up. Enabling H2 measurement input.
+        DispatcherTimer repositionTimer;
+        private void repositionTimer_Tick(object sender, EventArgs e)
+        {
+            var timer = sender as DispatcherTimer;
+            if (timer == null)
+            {
+                return;
+            }
+            if (isThirdMeasurement == false)
+            {
+                waiting.Visibility = Visibility.Hidden;
+                H2Measurement.IsEnabled = true;
+                H1Measurement.IsEnabled = true;
+                Keyboard.Focus(H2Measurement);
+            }
+            else
+            {
+                waiting3rdMeasurement.Visibility = Visibility.Hidden;
+                clear1.IsEnabled = false;
+                clear2.IsEnabled = false;
+                button.Visibility = Visibility.Hidden;
+                H1Measurement.IsEnabled = false;
+                H2Measurement.IsEnabled = false;               
+                textBlock6.Visibility = Visibility.Visible;
+                textBlock5.Visibility = Visibility.Visible;
+                H3Measurement.Visibility = Visibility.Visible;
+                button1.Visibility = Visibility.Visible;
+                textBlock4_Copy1.Visibility = Visibility.Visible;
+                clear3.Visibility = Visibility.Visible;
+                H3Measurement.IsEnabled = true;
+                H3Measurement.Focus();
+                isThirdMeasurement = false;//Must reset so first to measurements can be re-taken
+            }
+            timer.Stop();
+            repositionTimer = null;
         }
 
         string previousInput1 = "";
