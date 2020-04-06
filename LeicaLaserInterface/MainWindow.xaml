@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LeicaLaserInterface"
         mc:Ignorable="d"
-        Title="MainWindow" Height="737.6" Width="515">
+        Title="MainWindow" Height="737.6" Width="515" Closing="Window_Closing">
     <Grid Margin="0,10,-82,0" Height="725" VerticalAlignment="Top">
         <TextBlock x:Name="AppTitle" HorizontalAlignment="Left" Margin="32,29,0,635" Text="Height Measurement" TextWrapping="Wrap" Width="429" FontSize="32" TextAlignment="Center" Foreground="#FF4949A9"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="73,95,0,0" Text="Please turn on the Leica Laser to connect Bluetooth" TextWrapping="Wrap" VerticalAlignment="Top" Width="365" FontSize="16" Height="30"/>
@@ -29,6 +29,7 @@
         <Button x:Name="clear3" Content="X" HorizontalAlignment="Left" Margin="415,423,0,0" VerticalAlignment="Top" Width="23" FontSize="20" FontFamily="Lucida Console" Background="White" Foreground="#FFDD1B1B" Visibility="Hidden" BorderBrush="#FF0B0B0B" RenderTransformOrigin="0.435,-0.707" Click="clear3_Click"/>
         <TextBlock x:Name="waiting" HorizontalAlignment="Left" Margin="256,270,0,0" TextWrapping="Wrap" Text="Waiting...." Visibility="Hidden" VerticalAlignment="Top" Width="53"/>
         <TextBlock x:Name="waiting3rdMeasurement" HorizontalAlignment="Left" Margin="140,353,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Hidden" Width="273"><Run Text="Waiting for third measurement re-positioning"/><Run Text="...."/></TextBlock>
+        
     </Grid>
 
 </Window>

@@ -126,6 +126,11 @@ namespace LeicaLaserInterface
                         button.IsEnabled = false;
                         button.Visibility = Visibility.Visible;
                         isThirdMeasurement = true;
+                        clear1.IsEnabled = false;
+                        clear2.IsEnabled = false;
+                        H1Measurement.IsEnabled = false;
+                        H2Measurement.IsEnabled = false;
+                        checkBox.IsEnabled = false;
                         MessageBox.Show("Third measurement required.\n\nPlease take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
                         "3rd measurement will be enabled 10 seconds after closing this message.");
                         waiting3rdMeasurement.Visibility = Visibility.Visible;
@@ -155,7 +160,15 @@ namespace LeicaLaserInterface
         private void button1_Click(object sender, RoutedEventArgs e)//This is the button for thrid measurement submission
         {
             try
-            {    //Run appropriate data check on the 3rd measurement. For proper measurement DP will always be in the same place.
+            {
+                //Set respondent Identifiers for the 3rd measurement case.
+                string[] respondentInfo = GetRespondentIdentifiers();
+                arrayMeasurements[3, 2] = respondentInfo[0];
+                arrayMeasurements[3, 3] = respondentInfo[1];
+                arrayMeasurements[3, 4] = respondentInfo[2];
+                arrayMeasurements[3, 5] = respondentInfo[3];
+
+                //Run appropriate data check on the 3rd measurement. For proper measurement DP will always be in the same place.
                 if (arrayMeasurements[3, 1].Substring(0, 2).Contains(".") && (arrayMeasurements[3,1].Length == 5))
                 {
                     //Do appropriate CSV conversion for ALL measurements and save
@@ -202,8 +215,10 @@ namespace LeicaLaserInterface
         }
 
         //Clearing measurements from individual fields
+        bool clearIsClicked = false;
         private void clear1_Click(object sender, RoutedEventArgs e)
         {
+            clearIsClicked = true;
             regexOverride = true;
             Application.Current.Dispatcher.Invoke(() => { H1Measurement.Clear(); });
             H1Measurement.Focus();
@@ -243,6 +258,12 @@ namespace LeicaLaserInterface
         //Clean up to original state expecting first measurement
         public void RunCleanUp()
         {
+            arrayMeasurements[3, 0] = null;
+            arrayMeasurements[3, 1] = null;
+            arrayMeasurements[3, 2] = null;
+            arrayMeasurements[3, 3] = null;
+            arrayMeasurements[3, 4] = null;
+            arrayMeasurements[3, 5] = null;
             arrayMeasurements[1, 1] = null;
             arrayMeasurements[2, 1] = null;
             arrayMeasurements[3, 1] = null;
@@ -507,10 +528,10 @@ namespace LeicaLaserInterface
             arrayMeasurements[2, 3] = respondentInfo[1];
             arrayMeasurements[2, 4] = respondentInfo[2];
             arrayMeasurements[2, 5] = respondentInfo[3];
-            arrayMeasurements[3, 2] = respondentInfo[0];
-            arrayMeasurements[3, 3] = respondentInfo[1];
-            arrayMeasurements[3, 4] = respondentInfo[2];
-            arrayMeasurements[3, 5] = respondentInfo[3];
+            //arrayMeasurements[3, 2] = respondentInfo[0];
+            //arrayMeasurements[3, 3] = respondentInfo[1];
+            //arrayMeasurements[3, 4] = respondentInfo[2];
+            //arrayMeasurements[3, 5] = respondentInfo[3];
 
 
         }
@@ -554,15 +575,25 @@ namespace LeicaLaserInterface
                     if (manualMeasurement == false)
                         {
                         arrayMeasurements[1, 6] = "BluetoothInput";
-                        H2Measurement.IsEnabled = false;
-                        H1Measurement.IsEnabled = false;
-                        waiting.Visibility = Visibility.Visible;
-                        MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
-                        "2nd measurement will be enabled 10 seconds after closing this message.");
-                        repositionTimer = new System.Windows.Threading.DispatcherTimer();
-                        repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
-                        repositionTimer.Interval = new TimeSpan(0, 0, 10);
-                        repositionTimer.Start();
+                         if (clearIsClicked == false)
+                             {
+                               H2Measurement.IsEnabled = false;
+                                 H1Measurement.IsEnabled = false;
+                                button.IsEnabled = false;
+                                clear1.IsEnabled = false;
+                                clear2.IsEnabled = false;
+                                waiting.Visibility = Visibility.Visible;
+                                MessageBox.Show("Please take 10 seconds to re-position yourself for re-taking measurement.\n\n" +
+                                "2nd measurement will be enabled 10 seconds after closing this message.");
+                                repositionTimer = new System.Windows.Threading.DispatcherTimer();
+                                repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
+                                repositionTimer.Interval = new TimeSpan(0, 0, 10);
+                                repositionTimer.Start();
+                            }
+                            else
+                            {
+                                clearIsClicked = false;
+                            }
                         }
                         else
                         {
@@ -577,6 +608,7 @@ namespace LeicaLaserInterface
         private void repositionTimer_Tick(object sender, EventArgs e)
         {
             var timer = sender as DispatcherTimer;
+            
             if (timer == null)
             {
                 return;
@@ -586,6 +618,9 @@ namespace LeicaLaserInterface
                 waiting.Visibility = Visibility.Hidden;
                 H2Measurement.IsEnabled = true;
                 H1Measurement.IsEnabled = true;
+                clear1.IsEnabled = true;
+                clear2.IsEnabled = true;
+                button.IsEnabled = true;
                 Keyboard.Focus(H2Measurement);
             }
             else
@@ -606,6 +641,7 @@ namespace LeicaLaserInterface
                 H3Measurement.Focus();
                 isThirdMeasurement = false;//Must reset so first to measurements can be re-taken
             }
+            checkBox.IsEnabled = true;
             timer.Stop();
             repositionTimer = null;
         }
@@ -814,5 +850,11 @@ namespace LeicaLaserInterface
 
         }
 
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            WindowControl DistoTransfer = new WindowControl();
+            DistoTransfer.AppName = "DistoTransfer";
+            DistoTransfer.Close();
+        }
     }
 }
