@@ -789,8 +789,8 @@ namespace LeicaLaserInterface
         private void WriteCSVFile(string csvMeasurements)
         {
 
-            System.IO.Directory.CreateDirectory(@"C:\BodyMeasurements\HeightMeasurements");
-            string CSVFileName = @"C:\BodyMeasurements\HeightMeasurements\" + "HeightMeasurements_" + DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss") + ".csv";
+            System.IO.Directory.CreateDirectory(@"C:\NZHS\BodyMeasurements\HeightMeasurements");
+            string CSVFileName = @"C:\NZHS\BodyMeasurements\HeightMeasurements\" + "HeightMeasurements_" + DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss") + ".csv";
 
             System.IO.File.WriteAllText(CSVFileName, csvMeasurements);
                     
