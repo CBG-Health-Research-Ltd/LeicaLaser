@@ -295,6 +295,7 @@ namespace LeicaLaserInterface
             if (text == "CONNECTED")
             {
                 Application.Current.Dispatcher.Invoke(() => { Connectionstatus.Text = text; Connectionstatus.Foreground = Brushes.Green; });
+                //this.Topmost = true;
             }
             if (text == "Disconnected")
             {
@@ -589,6 +590,7 @@ namespace LeicaLaserInterface
                                 repositionTimer.Tick += new EventHandler(repositionTimer_Tick);
                                 repositionTimer.Interval = new TimeSpan(0, 0, 10);
                                 repositionTimer.Start();
+                                checkBox.IsEnabled = false;
                             }
                             else
                             {
